@@ -1,0 +1,52 @@
+name: Production Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            echo "🚀 Starting Deployment"
+
+            # Update system
+            sudo yum update -y
+
+            # Install Apache if not installed
+            if ! command -v httpd &> /dev/null
+            then
+              sudo yum install httpd -y
+              sudo systemctl enable httpd
+              sudo systemctl start httpd
+            fi
+
+            # Create index.html
+            echo "📄 Creating Hello World page"
+            sudo bash -c 'cat > /var/www/html/index.html <<EOF
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <title>Hello</title>
+            </head>
+            <body>
+              <h1>Hello World 🚀</h1>
+            </body>
+            </html>
+            EOF'
+
+            # Restart Apache
+            sudo systemctl restart httpd
+
+            echo "✅ Deployment Complete"
+
+
