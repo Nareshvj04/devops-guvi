@@ -26,6 +26,13 @@ jobs:
             if ! command -v httpd &> /dev/null
             then
               sudo yum install httpd -y
+
+              - name: Change Port to 8080
+              run: |
+              # Update the main Listen directive in httpd.conf
+              sudo sed -i 's/^Listen 80/Listen 8080/' /etc/httpd/conf/httpd.conf
+
+
               sudo systemctl enable httpd
               sudo systemctl start httpd
             fi
@@ -39,7 +46,7 @@ jobs:
               <title>Hello</title>
             </head>
             <body>
-              <h1>Hello World 🚀</h1>
+              <h1>Hello Naresh 🚀</h1>
             </body>
             </html>
             EOF'
